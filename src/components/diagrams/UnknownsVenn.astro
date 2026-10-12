@@ -1,0 +1,83 @@
+---
+// Hand-sketched: a tiny "things i know", a medium "things i know i don't know",
+// and a huge "things i don't know that i don't know" swallowing it.
+import '@fontsource/caveat/500.css';
+---
+
+<figure class="venn">
+  <svg viewBox="0 0 660 450" role="img" aria-label="Sketch of three circles: a small green circle 'things i know' off to the side, a red circle 'things i know i don't know', and a huge blue circle 'things i don't know that i don't know' that contains the red one">
+    <defs>
+      <!-- slightly wobbly lines, like a pen -->
+      <filter id="venn-rough" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.025" numOctaves="2" seed="4" />
+        <feDisplacementMap in="SourceGraphic" scale="4" />
+      </filter>
+      <pattern id="venn-hatch-blue" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(-50)">
+        <line x1="0" y1="0" x2="0" y2="7" class="hatch-blue" stroke-width="1.2" />
+      </pattern>
+      <pattern id="venn-hatch-red" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(-50)">
+        <line x1="0" y1="0" x2="0" y2="5" class="hatch-red" stroke-width="1.4" />
+      </pattern>
+    </defs>
+
+    <g filter="url(#venn-rough)">
+      <ellipse cx="390" cy="222" rx="252" ry="205" fill="url(#venn-hatch-blue)" class="stroke-blue" stroke-width="2" />
+      <ellipse cx="272" cy="236" rx="128" ry="98" class="fill-red stroke-red" stroke-width="2" />
+      <ellipse cx="275" cy="236" rx="128" ry="98" fill="url(#venn-hatch-red)" />
+      <ellipse cx="86" cy="262" rx="56" ry="45" fill="none" class="stroke-green" stroke-width="2" />
+    </g>
+
+    <text x="86" y="256" class="hand green" text-anchor="middle">things</text>
+    <text x="86" y="282" class="hand green" text-anchor="middle">i know</text>
+
+    <text x="272" y="228" class="hand red" text-anchor="middle">things i know</text>
+    <text x="272" y="256" class="hand red" text-anchor="middle">i don't know</text>
+
+    <text x="515" y="210" class="hand blue" text-anchor="middle">things i don't know</text>
+    <text x="515" y="240" class="hand blue" text-anchor="middle">that i don't know</text>
+  </svg>
+</figure>
+
+<style>
+  .venn { margin: 2rem 0; }
+  svg { width: 100%; height: auto; display: block; }
+
+  .venn {
+    --v-blue: #2f6fbf;
+    --v-blue-hatch: #86baea;
+    --v-red: #d9534f;
+    --v-red-fill: #f6cfd2;
+    --v-red-hatch: #ef9aa0;
+    --v-green: #3f9a4a;
+  }
+  :global(:root[data-theme='dark']) .venn {
+    --v-blue: #7fb2ec;
+    --v-blue-hatch: #2c4a6e;
+    --v-red: #f08a86;
+    --v-red-fill: #4a2427;
+    --v-red-hatch: #7a3a3f;
+    --v-green: #7cc785;
+  }
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .venn {
+      --v-blue: #7fb2ec;
+      --v-blue-hatch: #2c4a6e;
+      --v-red: #f08a86;
+      --v-red-fill: #4a2427;
+      --v-red-hatch: #7a3a3f;
+      --v-green: #7cc785;
+    }
+  }
+
+  .stroke-blue { stroke: var(--v-blue); }
+  .stroke-red { stroke: var(--v-red); }
+  .stroke-green { stroke: var(--v-green); }
+  .fill-red { fill: var(--v-red-fill); }
+  .hatch-blue { stroke: var(--v-blue-hatch); }
+  .hatch-red { stroke: var(--v-red-hatch); }
+
+  .hand { font-family: 'Caveat', cursive; font-size: 26px; font-weight: 500; }
+  .blue { fill: var(--v-blue); }
+  .red { fill: var(--v-red); }
+  .green { fill: var(--v-green); }
+</style>

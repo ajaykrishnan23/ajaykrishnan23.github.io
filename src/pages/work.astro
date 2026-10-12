@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { roles, earlier, awards, talks } from '../data/work';
+---
+
+<BaseLayout title="work" description="What I've built and where.">
+  <h1>work</h1>
+  <p class="muted">
+    ML and systems, mostly around documents: parsing them, extracting from them, and explaining how
+    to do it well.
+    <!-- TODO: add a resume link once public/resume.pdf exists: <a href="/resume.pdf">resume (pdf)</a> -->
+  </p>
+
+  <ol class="roles">
+    {roles.map((r) => (
+      <li>
+        <div class="role-head">
+          <h2>
+            {r.url ? <a href={r.url}>{r.org}</a> : r.org}
+            <span class="title">{r.title}</span>
+          </h2>
+          <span class="dates muted">{r.dates}{r.place && ` · ${r.place}`}</span>
+        </div>
+        <ul>
+          {r.points.map((p) => <li set:html={p} />)}
+        </ul>
+      </li>
+    ))}
+  </ol>
+
+  <h2>earlier</h2>
+  <ul>{earlier.map((e) => <li>{e}</li>)}</ul>
+
+  <h2>education</h2>
+  <!-- TODO: fill in your degrees -->
+  <ul>
+    <li>New York University <span class="muted">(degree, years)</span></li>
+    <li><span class="muted">(undergrad, years)</span></li>
+  </ul>
+
+  <h2>awards</h2>
+  <ul>{awards.map((a) => <li>{a}</li>)}</ul>
+
+  <h2>talks</h2>
+  <ul>{talks.map((t) => <li>{t}</li>)}</ul>
+</BaseLayout>
+
+<style>
+  .roles { list-style: none; padding: 0; margin: 2rem 0 0; }
+  .roles > li { padding: 1.25rem 0; border-top: 1px dashed var(--sage); }
+  .roles > li:first-child { border-top: 0; padding-top: 0; }
+  .role-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 0.25rem 1rem; }
+  .role-head h2 { margin: 0; font-size: 1.2rem; }
+  .role-head a { text-decoration-color: transparent; }
+  .role-head a:hover { text-decoration-color: var(--petal); }
+  .title { display: block; font-family: var(--font-body); font-size: 0.95rem; font-weight: 500; color: var(--leaf); margin-top: 0.15rem; }
+  .dates { font-size: 0.88rem; white-space: nowrap; }
+  ul { padding-left: 1.1rem; margin: 0.6rem 0 0; }
+  ul li { margin: 0.3rem 0; }
+  ul li::marker { color: var(--petal); }
+</style>

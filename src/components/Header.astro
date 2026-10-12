@@ -1,0 +1,86 @@
+---
+import { SITE } from '../site';
+const path = Astro.url.pathname;
+const nav = [
+  { href: '/', label: 'home' },
+  { href: '/work', label: 'work' },
+  { href: '/blog', label: 'blog' },
+];
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path.startsWith(href);
+---
+
+<header class="site-header wrap">
+  <a href="/" class="brand">{SITE.name}</a>
+  <nav aria-label="main">
+    {nav.map((n, i) => (
+      <>
+        {i > 0 && <span class="dot" aria-hidden="true">·</span>}
+        <a href={n.href} aria-current={isActive(n.href) ? 'page' : undefined}>{n.label}</a>
+      </>
+    ))}
+    <button class="theme-toggle" type="button" aria-label="toggle evening garden">
+      <svg viewBox="0 0 24 24" aria-hidden="true" class="sun"><circle cx="12" cy="12" r="4.5" /><g stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" /></g></svg>
+      <svg viewBox="0 0 24 24" aria-hidden="true" class="moon"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z" /></svg>
+    </button>
+  </nav>
+</header>
+
+<script>
+  const btn = document.querySelector<HTMLButtonElement>('.theme-toggle');
+  btn?.addEventListener('click', () => {
+    const root = document.documentElement;
+    const current =
+      root.dataset.theme ??
+      (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const next = current === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    try { localStorage.setItem('theme', next); } catch {}
+  });
+</script>
+
+<style>
+  .site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding-top: 2rem;
+    padding-bottom: 2.5rem;
+  }
+  .brand {
+    text-decoration: none;
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: 1.2rem;
+  }
+  .brand:hover { color: var(--ink); }
+
+  nav { display: flex; align-items: center; gap: 0.5rem; font-size: 0.98rem; }
+  nav a { text-decoration-color: transparent; }
+  nav a[aria-current='page'] { text-decoration-color: var(--marigold); }
+  .dot { color: var(--sage); }
+
+  .theme-toggle {
+    margin-left: 0.6rem;
+    width: 2rem;
+    height: 2rem;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--sage);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .theme-toggle:hover { color: var(--marigold); border-color: var(--marigold); }
+  .theme-toggle svg { width: 1rem; height: 1rem; fill: currentColor; }
+  .moon { display: none; }
+  :global(:root[data-theme='dark']) .sun { display: none; }
+  :global(:root[data-theme='dark']) .moon { display: block; }
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .sun { display: none; }
+    :global(:root:not([data-theme='light'])) .moon { display: block; }
+  }
+</style>

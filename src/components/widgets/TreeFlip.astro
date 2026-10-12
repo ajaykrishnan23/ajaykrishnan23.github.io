@@ -1,0 +1,342 @@
+---
+// A tree that grows down into the dark until you flip it toward the sun.
+// Slider = how much it has grown. Button flips it once; after that it refuses to go back.
+// Spring isn't drawn literally: soft washes of color, and blurry little flowers swinging down.
+const FLOWER_COLORS = ['#f7a8c4', '#ffd38a', '#ffffff', '#c9b8f2', '#f9c4a8', '#f28fad'];
+const flowers = Array.from({ length: 22 }, (_, i) => FLOWER_COLORS[i % FLOWER_COLORS.length]);
+---
+
+<figure class="tree-flip wide" data-state="negative">
+  <div class="stage">
+    <svg viewBox="0 0 600 400" role="img" aria-label="A tree growing; its direction depends on which way your thoughts face">
+      <defs>
+        <linearGradient id="tf-night" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#0b0b0d" />
+          <stop offset="1" stop-color="#000000" />
+        </linearGradient>
+        <radialGradient id="tf-dread" cx="0.5" cy="1" r="0.75">
+          <stop offset="0" stop-color="#3a0a10" stop-opacity="0.55" />
+          <stop offset="1" stop-color="#000000" stop-opacity="0" />
+        </radialGradient>
+        <radialGradient id="tf-vignette" cx="0.5" cy="0.45" r="0.75">
+          <stop offset="0.55" stop-color="#000" stop-opacity="0" />
+          <stop offset="1" stop-color="#000" stop-opacity="0.9" />
+        </radialGradient>
+        <linearGradient id="tf-day" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#eaf5fb" />
+          <stop offset="0.55" stop-color="#fdf6ea" />
+          <stop offset="1" stop-color="#eef7e6" />
+        </linearGradient>
+        <linearGradient id="tf-ground" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#cfe9c3" stop-opacity="0" />
+          <stop offset="1" stop-color="#bfe2b2" stop-opacity="0.9" />
+        </linearGradient>
+        <filter id="tf-wash" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="42" />
+        </filter>
+        <filter id="tf-soft" x="-100%" y="-100%" width="300%" height="300%">
+          <feGaussianBlur stdDeviation="1.3" />
+        </filter>
+        <filter id="tf-flower-blur" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="0.7" />
+        </filter>
+        <!-- five petals and a heart; petal color comes from the <use> fill -->
+        <g id="tf-flower">
+          <ellipse cx="0" cy="-4.6" rx="3.2" ry="4.6" />
+          <ellipse cx="0" cy="-4.6" rx="3.2" ry="4.6" transform="rotate(72)" />
+          <ellipse cx="0" cy="-4.6" rx="3.2" ry="4.6" transform="rotate(144)" />
+          <ellipse cx="0" cy="-4.6" rx="3.2" ry="4.6" transform="rotate(216)" />
+          <ellipse cx="0" cy="-4.6" rx="3.2" ry="4.6" transform="rotate(288)" />
+          <circle r="2.3" fill="#fff3c4" />
+        </g>
+      </defs>
+
+      <!-- negative: pitch black, a faint red dread down where the tree is headed -->
+      <g class="layer night">
+        <rect width="600" height="400" fill="url(#tf-night)" />
+        <rect class="dread" width="600" height="400" fill="url(#tf-dread)" />
+        <rect width="600" height="400" fill="url(#tf-vignette)" />
+      </g>
+
+      <!-- positive: garden light, not a garden drawing -->
+      <g class="layer day">
+        <rect width="600" height="400" fill="url(#tf-day)" />
+        <g filter="url(#tf-wash)">
+          <circle class="wash w1" cx="480" cy="70" r="110" fill="#ffe1a8" opacity="0.85" />
+          <circle class="wash w2" cx="90" cy="150" r="100" fill="#fbd0df" opacity="0.6" />
+          <circle class="wash w3" cx="300" cy="380" r="150" fill="#cdeccb" opacity="0.75" />
+          <circle class="wash w4" cx="230" cy="40" r="90" fill="#dcd2fa" opacity="0.45" />
+        </g>
+        <rect y="300" width="600" height="100" fill="url(#tf-ground)" />
+        <g class="falling" filter="url(#tf-flower-blur)">
+          {flowers.map((fill) => (
+            <g transform="translate(-40 -40)">
+              <use href="#tf-flower" fill={fill} opacity="0.8" />
+            </g>
+          ))}
+        </g>
+      </g>
+
+      <!-- the dark soil the tree hangs from; it melts away when flipped -->
+      <rect class="soil" x="0" y="0" width="600" height="42" />
+
+      <g class="anchor">
+        <g class="sway">
+          <g class="tree"></g>
+          <g class="blossoms"></g>
+        </g>
+      </g>
+    </svg>
+
+    <label class="slider">
+      <span class="sr-only">possible outcomes your thoughts come up with</span>
+      <input type="range" min="0" max="100" value="35" />
+      <span class="slider-hint" aria-hidden="true">possible outcomes your thoughts come up with</span>
+    </label>
+  </div>
+
+  <div class="controls">
+    <button type="button" class="flip">flip it ☀️</button>
+    <p class="msg" aria-live="polite"></p>
+  </div>
+  <figcaption>the tree represents the branches of all the thoughts your anxiety can spiral into, downwards or upwards</figcaption>
+</figure>
+
+<script>
+  import { spawn, step, breeze, type Flake } from '../../lib/flutter';
+
+  /** Swing the little flowers down the spring scene (viewBox units), only while it's flipped and on screen. */
+  function startFlowers(fig: HTMLElement) {
+    const W = 600;
+    const H = 400;
+    const els = [...fig.querySelectorAll<SVGGElement>('.falling > g')];
+    const flakes: Flake[] = els.map(() => spawn(W, H, true));
+    let onScreen = false;
+    let running = false;
+    let last = 0;
+
+    const frame = (now: number) => {
+      if (!onScreen || fig.dataset.state !== 'positive') { running = false; return; }
+      const dt = last ? Math.min((now - last) / 1000, 0.05) : 0;
+      last = now;
+      const t = now / 1000;
+      const wind = breeze(t);
+      flakes.forEach((f, i) => {
+        const p = step(f, t, dt, wind);
+        if (p.y > H + 15 || p.x < -40 || p.x > W + 40) flakes[i] = spawn(W, H, false);
+        els[i].setAttribute(
+          'transform',
+          `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)}) rotate(${p.rot.toFixed(1)}) scale(${(f.scale * 1.15).toFixed(2)})`,
+        );
+      });
+      requestAnimationFrame(frame);
+    };
+    const kick = () => {
+      if (running || !onScreen || fig.dataset.state !== 'positive') return;
+      running = true;
+      last = 0;
+      requestAnimationFrame(frame);
+    };
+
+    new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; kick(); }).observe(fig);
+    return kick;
+  }
+
+  const DEPTH = 8;
+  const WIDTHS = [9, 7, 5.2, 3.8, 2.8, 2, 1.5, 1.1];
+  const BLOSSOM = ['#f7b6cd', '#ffffff', '#ffd38a', '#d9c9f7', '#fbd0bb'];
+
+  type Node = { left: number; right: number; ratio: number; kids: [Node, Node] | null };
+
+  function mulberry32(seed: number) {
+    return () => {
+      seed |= 0; seed = (seed + 0x6d2b79f5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function build(rnd: () => number, d: number): Node {
+    return {
+      left: 0.28 + rnd() * 0.3,
+      right: 0.28 + rnd() * 0.3,
+      ratio: 0.68 + rnd() * 0.1,
+      kids: d + 1 < DEPTH ? [build(rnd, d + 1), build(rnd, d + 1)] : null,
+    };
+  }
+
+  function render(fig: HTMLElement, shape: Node, growth: number) {
+    const level = growth * DEPTH;
+    const paths: string[] = Array(DEPTH).fill('');
+    const tips: [number, number, number][] = [];
+
+    const walk = (n: Node, x: number, y: number, ang: number, len: number, d: number) => {
+      const f = Math.min(Math.max(level - d, 0), 1);
+      if (f <= 0) return;
+      const l = len * f;
+      const x2 = x + Math.sin(ang) * l;
+      const y2 = y - Math.cos(ang) * l;
+      paths[d] += `M${x.toFixed(1)} ${y.toFixed(1)}L${x2.toFixed(1)} ${y2.toFixed(1)}`;
+      if (d >= 3 && (f < 1 || !n.kids)) tips.push([x2, y2, d]);
+      if (f < 1 || !n.kids) return;
+      walk(n.kids[0], x2, y2, ang - n.left, len * n.ratio, d + 1);
+      walk(n.kids[1], x2, y2, ang + n.right, len * n.ratio, d + 1);
+    };
+    walk(shape, 0, 0, 0, 72, 0);
+
+    const tree = fig.querySelector('.tree')!;
+    tree.innerHTML = paths
+      .map((p, d) => (p ? `<path d="${p}" stroke-width="${WIDTHS[d]}" />` : ''))
+      .join('');
+
+    const blossoms = fig.querySelector('.blossoms')!;
+    blossoms.innerHTML = tips
+      .map(([x, y, d], i) => {
+        const r = (2.2 + (i % 3) * 0.9) * (d >= 6 ? 1 : 0.8);
+        return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}" fill="${BLOSSOM[i % BLOSSOM.length]}" />`;
+      })
+      .join('');
+  }
+
+  document.querySelectorAll<HTMLElement>('.tree-flip').forEach((fig) => {
+    const shape = build(mulberry32(7), 0);
+    const slider = fig.querySelector<HTMLInputElement>('input[type=range]')!;
+    const button = fig.querySelector<HTMLButtonElement>('.flip')!;
+    const msg = fig.querySelector<HTMLElement>('.msg')!;
+
+    const draw = () => render(fig, shape, Number(slider.value) / 100);
+    slider.addEventListener('input', draw);
+    draw();
+    const startSpring = startFlowers(fig);
+
+    button.addEventListener('click', () => {
+      if (fig.dataset.state === 'negative') {
+        fig.dataset.state = 'positive';
+        button.textContent = 'reset';
+        startSpring();
+        return;
+      }
+      // reset never takes you back
+      if (msg.textContent) {
+        msg.classList.remove('wiggle');
+        void msg.offsetWidth;
+        msg.classList.add('wiggle');
+      } else {
+        msg.textContent = 'its never going negative again :)';
+      }
+    });
+  });
+</script>
+
+<style>
+  .tree-flip { margin-block: 2.5rem; }
+  .stage {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+  svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 14px;
+    border: 1px solid var(--sage);
+    overflow: hidden;
+  }
+
+  .layer { transition: opacity 0.9s ease; }
+  .day { opacity: 0; }
+  [data-state='positive'] .day { opacity: 1; }
+  [data-state='positive'] .night { opacity: 0; }
+
+  /* the red down below breathes, slowly */
+  .dread { animation: dread 6s ease-in-out infinite; }
+  @keyframes dread { 50% { opacity: 0.45; } }
+
+  /* color washes breathe and slide, very slowly */
+  .wash { animation: wash 24s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+  .w2 { animation-duration: 30s; animation-direction: alternate-reverse; }
+  .w3 { animation-duration: 36s; }
+  .w4 { animation-duration: 28s; animation-direction: alternate-reverse; }
+  @keyframes wash { to { transform: translate(40px, 14px) scale(1.12); } }
+
+
+  /* the flip: the tree's root slides from the top edge to the bottom edge and turns upright */
+  .anchor { transition: transform 0.9s cubic-bezier(0.65, 0, 0.35, 1); }
+  .anchor { transform: translate(300px, 42px) scaleY(-1); }
+  [data-state='positive'] .anchor { transform: translate(300px, 358px) scaleY(1); }
+
+  .soil { fill: #050505; transition: opacity 0.9s ease; }
+  [data-state='positive'] .soil { opacity: 0; }
+
+  .tree :global(path) {
+    fill: none;
+    stroke: #3a3a40;
+    stroke-linecap: round;
+    transition: stroke 0.9s ease, opacity 0.9s ease;
+  }
+  [data-state='positive'] .tree :global(path) { stroke: #a8927c; opacity: 0.85; }
+  .blossoms { opacity: 0; transition: opacity 0.9s ease 0.5s; filter: url(#tf-soft); }
+  [data-state='positive'] .blossoms { opacity: 0.9; }
+
+  /* a chill breeze, only in spring */
+  .sway { transform-origin: 0 0; }
+  [data-state='positive'] .sway { animation: breeze 7s ease-in-out 1s infinite; }
+  @keyframes breeze { 0%, 100% { transform: rotate(-0.8deg); } 50% { transform: rotate(0.9deg); } }
+
+  .slider {
+    display: flex;
+    align-items: stretch;
+    gap: 0.2rem;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+  }
+  .slider-hint {
+    writing-mode: vertical-rl;
+    text-align: center;
+    line-height: 1.2;
+  }
+  .slider input {
+    writing-mode: vertical-lr;
+    direction: ltr; /* night: drag down to grow down */
+    flex: 1;
+    width: 1.5rem;
+    accent-color: #4a4a50;
+    cursor: ns-resize;
+  }
+  [data-state='positive'] .slider input { direction: rtl; accent-color: var(--marigold); }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+    margin-top: 0.9rem;
+  }
+  .flip {
+    font: inherit;
+    font-weight: 600;
+    padding: 0.45rem 1.1rem;
+    border-radius: 999px;
+    border: 1px solid var(--sage);
+    background: var(--sage-soft);
+    color: var(--ink);
+    cursor: pointer;
+    transition: background 0.3s ease, border-color 0.3s ease;
+  }
+  .flip:hover { border-color: var(--marigold); background: color-mix(in srgb, var(--marigold) 18%, transparent); }
+  .msg { margin: 0; font-family: var(--font-head); font-style: italic; color: var(--petal); }
+  .msg.wiggle { animation: wiggle 0.5s ease; display: inline-block; }
+  @keyframes wiggle { 25% { transform: rotate(-3deg); } 75% { transform: rotate(3deg); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anchor, .layer { transition-duration: 0.01s; }
+    [data-state='positive'] .sway { animation: none; }
+    .msg.wiggle { animation: none; }
+  }
+
+  figcaption { font-size: 0.88rem; color: var(--ink-soft); margin-top: 0.4rem; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>

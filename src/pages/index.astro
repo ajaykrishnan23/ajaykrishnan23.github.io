@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostList from '../components/PostList.astro';
+import { getListItems } from '../lib/posts';
+import { SITE } from '../site';
+
+const items = (await getListItems()).slice(0, 5);
+---
+
+<BaseLayout>
+  <section class="intro">
+    <h1>hey! i'm ajay.</h1>
+    <p>
+      I'm based out of New York. I work as a devrel at
+      <a href="https://unstructured.io">Unstructured</a> where we parse documents for a living.
+      I love applying AI in different places and this has led me towards banking, fashion,
+      documents, space science and more.
+    </p>
+    <p>
+      I love thinking and optimization and what you see here is how I see things in my brain :)
+    </p>
+    <p class="links">
+      <a href="/work">work</a> ·
+      <a href={SITE.links.github}>github</a> ·
+      <a href={SITE.links.linkedin}>linkedin</a> ·
+      <a href={SITE.links.email}>say hi</a>
+    </p>
+  </section>
+
+  <section>
+    <h2>recent writing</h2>
+    <PostList items={items} />
+    <p><a href="/blog">all posts →</a></p>
+  </section>
+</BaseLayout>
+
+<style>
+  .intro { margin-bottom: 3rem; }
+  .intro p { max-width: 60ch; }
+  .links { color: var(--ink-soft); }
+</style>

@@ -1,0 +1,171 @@
+@import '@fontsource-variable/fraunces';
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/jetbrains-mono';
+
+/* ---------- spring morning (light) ---------- */
+:root {
+  --bg: #fbf7ee;
+  --sun: rgba(255, 206, 120, 0.38);
+  --sun-2: rgba(255, 170, 190, 0.14);
+  --ink: #1f3a2b;
+  --ink-soft: #587262;
+  --sage: #b9d1ae;
+  --sage-soft: #ebf1e3;
+  --leaf: #6fa35b;
+  --petal: #d94f76;
+  --marigold: #e39a12;
+  --code-bg: #eef3e7;
+
+  --font-head: 'Fraunces Variable', Georgia, serif;
+  --font-body: 'Inter Variable', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  --measure: 40rem; /* ~66 characters of body text */
+  color-scheme: light;
+}
+
+/* ---------- evening garden (dark) ---------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #111914;
+    --sun: rgba(255, 190, 90, 0.09);
+    --sun-2: rgba(242, 143, 173, 0.05);
+    --ink: #e5eee0;
+    --ink-soft: #9fb4a2;
+    --sage: #3a5243;
+    --sage-soft: #19241d;
+    --leaf: #8cc277;
+    --petal: #f28fad;
+    --marigold: #f5c35b;
+    --code-bg: #18221c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme='dark'] {
+  --bg: #111914;
+  --sun: rgba(255, 190, 90, 0.09);
+  --sun-2: rgba(242, 143, 173, 0.05);
+  --ink: #e5eee0;
+  --ink-soft: #9fb4a2;
+  --sage: #3a5243;
+  --sage-soft: #19241d;
+  --leaf: #8cc277;
+  --petal: #f28fad;
+  --marigold: #f5c35b;
+  --code-bg: #18221c;
+  color-scheme: dark;
+}
+
+/* ---------- base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--bg);
+  /* the late-morning sun, top-left, and a faint blossom haze opposite */
+  background-image:
+    radial-gradient(60rem 40rem at -10% -15%, var(--sun), transparent 60%),
+    radial-gradient(40rem 30rem at 110% 0%, var(--sun-2), transparent 60%);
+  background-repeat: no-repeat;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+.wrap {
+  max-width: calc(var(--measure) + 2rem);
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-head);
+  font-weight: 560;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  font-variation-settings: 'SOFT' 100, 'WONK' 0;
+}
+h1 { font-size: clamp(1.9rem, 5vw, 2.5rem); margin: 0 0 0.5rem; }
+h2 { font-size: 1.45rem; margin: 2.5rem 0 0.75rem; }
+h3 { font-size: 1.15rem; margin: 2rem 0 0.5rem; }
+
+p { margin: 0 0 1.15rem; }
+
+/* links bloom: sage underline turns petal pink */
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--sage);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.35s ease, color 0.35s ease;
+}
+a:hover, a:focus-visible { text-decoration-color: var(--petal); color: var(--petal); }
+
+:focus-visible { outline: 2px solid var(--marigold); outline-offset: 3px; border-radius: 3px; }
+
+code, pre { font-family: var(--font-mono); font-size: 0.9em; }
+:not(pre) > code {
+  background: var(--code-bg);
+  padding: 0.12em 0.35em;
+  border-radius: 4px;
+}
+pre {
+  padding: 1rem 1.1rem;
+  border-radius: 10px;
+  border: 1px solid var(--sage);
+  overflow-x: auto;
+  line-height: 1.55;
+}
+/* shiki dual themes */
+.astro-code, .astro-code span { background-color: var(--code-bg) !important; }
+:root[data-theme='dark'] .astro-code,
+:root[data-theme='dark'] .astro-code span { color: var(--shiki-dark) !important; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .astro-code,
+  :root:not([data-theme='light']) .astro-code span { color: var(--shiki-dark) !important; }
+}
+
+img { max-width: 100%; height: auto; border-radius: 10px; }
+
+hr { border: 0; border-top: 1px dashed var(--sage); margin: 2.5rem 0; }
+
+blockquote {
+  margin: 1.5rem 0;
+  padding: 0.25rem 1rem;
+  border-left: 3px solid var(--marigold);
+  color: var(--ink-soft);
+}
+
+.muted { color: var(--ink-soft); }
+
+.tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  text-transform: lowercase;
+  white-space: nowrap;
+}
+.tag-technical { background: color-mix(in srgb, var(--leaf) 18%, transparent); color: var(--leaf); }
+.tag-not-so-technical { background: color-mix(in srgb, var(--petal) 15%, transparent); color: var(--petal); }
+
+/* a widget can breathe wider than the text column */
+.wide {
+  width: min(100vw - 2rem, 52rem);
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Reduced motion: drop the big movements (flips, wiggles, sways) per component,
+   but keep the slow ambient drift. It's small and gentle, and it's part of the mood. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}

@@ -1,0 +1,22 @@
+---
+// One thought turning into another: the old one struck through, an arrow, the new one.
+interface Props {
+  from: string;
+  to: string;
+}
+const { from, to } = Astro.props;
+---
+
+<div class="shift">
+  <p class="from"><s>{from}</s></p>
+  <p class="arrow" aria-hidden="true">↓</p>
+  <p class="to">{to}</p>
+</div>
+
+<style>
+  .shift { margin: 1.75rem 0; }
+  .shift p { margin: 0; }
+  .from { color: var(--ink-soft); }
+  .from s { text-decoration-color: var(--ink-soft); }
+  .arrow { color: var(--ink-soft); line-height: 1.6; }
+</style>

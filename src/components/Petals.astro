@@ -1,0 +1,93 @@
+---
+// Soft little flowers drifting down behind every page, swinging like falling leaves.
+// Lanterns-ish in the evening garden. Motion lives in src/lib/flutter.ts.
+const COUNT = 3;
+---
+
+<div class="petals" aria-hidden="true" data-count={COUNT}>
+  {Array.from({ length: COUNT }, (_, i) => (
+    <svg class={`flower c${i % 4}`} viewBox="-10 -10 20 20">
+      <g class="petal-ring">
+        {[0, 72, 144, 216, 288].map((a) => (
+          <ellipse cx="0" cy="-4.6" rx="3.2" ry="4.6" transform={`rotate(${a})`} />
+        ))}
+      </g>
+      <circle class="heart" r="2.4" />
+    </svg>
+  ))}
+</div>
+
+<script>
+  import { spawn, step, breeze, type Flake } from '../lib/flutter';
+
+  const box = document.querySelector<HTMLElement>('.petals');
+  if (box) {
+    const els = [...box.querySelectorAll<SVGSVGElement>('.flower')];
+    let w = innerWidth;
+    let h = innerHeight;
+    // a few flowers start together from the top; each falls at its own pace,
+    // and when one lands it rests 2s before a new one starts from the top
+    const PAUSE = 2;
+    const flakes: Flake[] = els.map(() => spawn(w, h, false));
+    const waits = els.map(() => 0); // seconds before each one (re)starts
+    addEventListener('resize', () => { w = innerWidth; h = innerHeight; });
+
+    let last = performance.now();
+    const frame = (now: number) => {
+      const dt = Math.min((now - last) / 1000, 0.05);
+      last = now;
+      const t = now / 1000;
+      const wind = breeze(t);
+      flakes.forEach((f, i) => {
+        if (waits[i] > 0) {
+          waits[i] -= dt;
+          els[i].style.visibility = 'hidden';
+          return;
+        }
+        els[i].style.visibility = 'visible';
+        const p = step(f, t, dt, wind);
+        if (p.y > h + 30 || p.x < -80 || p.x > w + 80) {
+          flakes[i] = spawn(w, h, false);
+          waits[i] = PAUSE;
+        }
+        els[i].style.transform = `translate(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px) rotate(${p.rot.toFixed(1)}deg) scale(${f.scale.toFixed(2)})`;
+      });
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  }
+</script>
+
+<style>
+  .petals {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .flower {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    filter: blur(1px);
+    opacity: 0.65;
+    visibility: hidden; /* shown once its turn to fall comes */
+    will-change: transform;
+  }
+  .heart { fill: #fff3c4; }
+  .c0 .petal-ring { fill: #f7a8c4; }
+  .c1 .petal-ring { fill: #ffd38a; }
+  .c2 .petal-ring { fill: #c9b8f2; }
+  .c3 .petal-ring { fill: #ffffff; }
+  .c3 .heart { fill: #ffd38a; }
+
+  /* evening garden: dimmer and warmer, like lanterns far off */
+  :global(:root[data-theme='dark']) .flower { opacity: 0.32; }
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .flower { opacity: 0.32; }
+  }
+</style>

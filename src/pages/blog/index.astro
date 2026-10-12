@@ -1,0 +1,73 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostList from '../../components/PostList.astro';
+import { getListItems } from '../../lib/posts';
+
+const items = await getListItems();
+const tabs = [
+  { key: 'all', label: 'all' },
+  { key: 'technical', label: 'technical' },
+  { key: 'not-so-technical', label: 'not so technical' },
+];
+---
+
+<BaseLayout title="blog" description="Writing, technical and not so technical.">
+  <h1>blog</h1>
+  <div class="tabs" role="group" aria-label="filter posts">
+    {tabs.map((t, i) => (
+      <button type="button" data-filter={t.key} aria-pressed={i === 0 ? 'true' : 'false'}>{t.label}</button>
+    ))}
+  </div>
+  <PostList items={items} />
+  <p class="empty muted" hidden>nothing here yet.</p>
+</BaseLayout>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.tabs button');
+  const rows = document.querySelectorAll<HTMLElement>('.post-list li');
+  const empty = document.querySelector<HTMLElement>('.empty')!;
+
+  function apply(filter: string) {
+    let shown = 0;
+    rows.forEach((li) => {
+      const show = filter === 'all' || li.dataset.tag === filter;
+      li.hidden = !show;
+      if (show) shown++;
+    });
+    empty.hidden = shown > 0;
+    buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === filter)));
+  }
+
+  buttons.forEach((b) =>
+    b.addEventListener('click', () => {
+      const f = b.dataset.filter!;
+      apply(f);
+      history.replaceState(null, '', f === 'all' ? location.pathname : `?tag=${f}`);
+    }),
+  );
+
+  // remember the tab via ?tag=… so filtered links can be shared
+  const initial = new URLSearchParams(location.search).get('tag');
+  if (initial && [...buttons].some((b) => b.dataset.filter === initial)) apply(initial);
+</script>
+
+<style>
+  .tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.5rem 0 1.75rem; }
+  .tabs button {
+    font: inherit;
+    font-size: 0.9rem;
+    padding: 0.3rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid var(--sage);
+    background: transparent;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  }
+  .tabs button:hover { border-color: var(--petal); color: var(--ink); }
+  .tabs button[aria-pressed='true'] {
+    background: var(--sage-soft);
+    border-color: var(--leaf);
+    color: var(--ink);
+    font-weight: 600;
+  }</style>

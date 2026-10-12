@@ -1,0 +1,182 @@
+// Posts I've written elsewhere. They show up in the blog list and link out.
+export type ExternalPost = {
+  title: string;
+  url: string;
+  date: string; // YYYY-MM-DD
+  description: string;
+  source: string; // shown next to the title, e.g. "unstructured.io"
+  tag: 'technical' | 'not-so-technical';
+};
+
+const uns = (slug: string) => `https://unstructured.io/blog/${slug}`;
+
+export const externalPosts: ExternalPost[] = [
+  {
+    title: 'How to Parse a Form',
+    url: uns('how-to-parse-a-form'),
+    date: '2026-10-05',
+    description: 'Why forms are hard to parse automatically: layout carries meaning, so values land under the wrong label and checkboxes get misread.',
+    source: 'unstructured.io',
+    tag: 'technical',
+  },
+  {
+    title: 'Everyone Said Frontier Models Would Eat Document Processing. The Opposite Happened.',
+    url: uns('why-frontier-models-havent-replaced-document-processing'),
+    date: '2026-09-28',
+    description: 'Document processing grew instead of being absorbed by frontier models, because the hard part moved from reading pages to trusting every field.',
+    source: 'unstructured.io',
+    tag: 'technical',
+  },
+  {
+    title: 'Frontier Models Are Strong But Document Parsing Is Harder',
+    url: uns('frontier-models-are-strong-but-document-parsing-is-harder'),
+    date: '2026-04-30',
+    description: 'Benchmarks five frontier models on SCORE-Bench against an optimized VLM parsing pipeline.',
+    source: 'unstructured.io',
+    tag: 'technical',
+  },
+  {
+    title: 'How We Taught an AI Agent to Fix Our Training Data',
+    url: uns('how-we-taught-an-ai-agent-to-fix-our-training-data'),
+    date: '2026-04-23',
+    description: 'A VLM agent harmonizing inconsistent layout annotations before fine-tuning a layout detection model.',
+    source: 'unstructured.io',
+    tag: 'technical',
+  },
+  {
+    title: 'Webhooks: connect Unstructured to everything that comes after',
+    url: uns('webhooks-connect-unstructured-to-everything-that-comes-after'),
+    date: '2026-04-15',
+    description: 'Webhooks that fire on Unstructured job events so downstream pipelines can react automatically.',
+    source: 'unstructured.io',
+    tag: 'technical',
+  },
+  {
+    title: 'Introducing: Extract',
+    url: uns('introducing-extract'),
+    date: '2026-03-26',
+    description: 'Extract, a workflow node that pulls structured data out of processed documents.',
+    source: 'unstructured.io',
+    tag: 'technical',
+  },
+  {
+    title: 'Agentic Table Parsing: A Composable Approach to Complex Documents',
+    url: uns('agentic-table-parsing-a-composable-approach-to-complex-documents'),
+    date: '2026-01-20',
+    description: 'A composable multi-model architecture for complex tables, evaluated on SCORE-Bench.',
+    source: 'unstructured.io',
+    tag: 'technical',
+  },
+  {
+    title: 'Beyond Retrieval: Adding a Memory Layer to RAG with Unstructured and Mem0',
+    url: uns('beyond-retrieval-adding-a-memory-layer-to-rag-with-unstructured-and-mem0'),
+    date: '2025-10-24',
+    description: 'Adding a Mem0 memory layer to RAG so answers adapt to each user.',
+    source: 'unstructured.io',
+    tag: 'technical',
+  },
+  {
+    title: 'Everything (from) Everywhere All At Once - Enterprise RAG with Multiple Sources and Filetypes',
+    url: uns('everything-from-everywhere-all-at-once-enterprise-rag-with-multiple-sources-and-filetypes'),
+    date: '2025-10-02',
+    description: 'One RAG index over PDFs, slides, spreadsheets and emails from OneDrive, Azure Blob Storage and Outlook.',
+    source: 'unstructured.io',
+    tag: 'technical',
+  },
+  {
+    title: 'Benchmarking Document Parsing (and What Actually Matters)',
+    url: uns('benchmarking-document-parsing-and-what-actually-matters'),
+    date: '2025-09-22',
+    description: 'The SCORE evaluation framework and why format-agnostic metrics make fairer parsing benchmarks.',
+    source: 'unstructured.io',
+    tag: 'technical',
+  },
+  {
+    title: "When Open Source Isn't Good Enough",
+    url: uns('when-open-source-isnt-good-enough'),
+    date: '2025-09-15',
+    description: 'The build-vs-buy moment when an open source document pipeline has to scale to production.',
+    source: 'unstructured.io',
+    tag: 'technical',
+  },
+  {
+    title: 'Preserving Table Structure for Better Retrieval',
+    url: uns('preserving-table-structure-for-better-retrieval'),
+    date: '2025-08-07',
+    description: 'Keeping table structure from filings like 10-Qs improves retrieval in LLM pipelines.',
+    source: 'unstructured.io',
+    tag: 'technical',
+  },
+  {
+    title: 'Getting Started with Unstructured and Redis',
+    url: uns('getting-started-with-unstructured-and-redis'),
+    date: '2025-07-30',
+    description: 'A no-code pipeline from S3 through Unstructured into Redis.',
+    source: 'unstructured.io',
+    tag: 'technical',
+  },
+  {
+    title: 'Rethinking RAG without Embeddings',
+    url: uns('rethinking-rag-without-embeddings'),
+    date: '2025-07-26',
+    description: 'RAG on BM25 keyword retrieval instead of vector embeddings, and the tradeoffs.',
+    source: 'unstructured.io',
+    tag: 'technical',
+  },
+  {
+    title: 'Finding Needles in a Haystack: PII Detection at Scale with Unstructured, Box, and Elasticsearch',
+    url: uns('finding-needles-in-a-haystack-pii-detection-at-scale-with-unstructured-box-and-elasticsearch'),
+    date: '2025-06-03',
+    description: 'Detecting PII in Box documents with Unstructured and indexing results in Elasticsearch.',
+    source: 'unstructured.io',
+    tag: 'technical',
+  },
+  {
+    title: 'Getting Started with Unstructured and IBM watsonx.data',
+    url: uns('getting-started-with-unstructured-and-ibm-watsonx-data'),
+    date: '2025-05-14',
+    description: 'From Azure Blob Storage through Unstructured into an IBM watsonx.data table.',
+    source: 'unstructured.io',
+    tag: 'technical',
+  },
+  {
+    title: 'Unstructured data processing with NVIDIA NeMo Retriever, Unstructured, and Elasticsearch',
+    url: 'https://www.elastic.co/search-labs/blog/unstructured-data-processing-with-nvidia-nemo-retriever-unstructured-and-elasticsearch',
+    date: '2025-05-08',
+    description: 'A scalable pipeline with NeMo Retriever, the Unstructured Platform and Elasticsearch for RAG.',
+    source: 'elastic.co',
+    tag: 'technical',
+  },
+  {
+    title: 'Getting Started with Unstructured and Snowflake',
+    url: uns('getting-started-with-unstructured-and-snowflake'),
+    date: '2025-04-22',
+    description: 'Preprocessing documents with Unstructured and loading them into Snowflake for RAG.',
+    source: 'unstructured.io',
+    tag: 'technical',
+  },
+  {
+    title: 'All Your Unstructured Data in a Databricks Delta Table. Just Say the Word.',
+    url: uns('all-your-unstructured-data-in-a-databricks-delta-table-just-say-the-word'),
+    date: '2025-04-16',
+    description: 'Claude Desktop + MCP moving data from S3 through Unstructured into Databricks, in plain English.',
+    source: 'unstructured.io',
+    tag: 'technical',
+  },
+  {
+    title: 'Building a No-Code Data Preprocessing Pipeline with Firecrawl and Unstructured MCP',
+    url: uns('building-a-no-code-data-preprocessing-pipeline-with-firecrawl-and-unstructured-mcp'),
+    date: '2025-03-24',
+    description: 'Crawling sites with Firecrawl and processing them through the Unstructured MCP server.',
+    source: 'unstructured.io',
+    tag: 'technical',
+  },
+  {
+    title: 'ELI5: A Simple Framework for Contrastive Learning of Visual Representations',
+    url: 'https://medium.com/analytics-vidhya/eli5-a-simple-framework-for-contrastive-learning-of-visual-representations-20d9509d0a12',
+    date: '2021-01-05',
+    description: 'A plain-language explainer of SimCLR, how it works, and its pros and cons.',
+    source: 'medium',
+    tag: 'technical',
+  },
+];
